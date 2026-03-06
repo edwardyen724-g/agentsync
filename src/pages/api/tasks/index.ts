@@ -48,40 +48,14 @@ export default async function handler(req: AuthedRequest, res: NextApiResponse) 
 
       try {
         const tasksSnapshot = await firestore.collection('tasks').where('userId', '==', userId).get();
-        const tasksData = tasksSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
+        const tasksData = tasksSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         return res.status(200).json(tasksData);
-      } catch (err) {
-        return res.status(500).json({ message: err instanceof Error ? err.message : String(err) });
-      }
-    }
-    case 'POST': {
-      if (!rateLimit(userId)) {
-        return res.status(429).json({ message: 'Too many requests' });
-      }
-
-      try {
-        const { title, description } = req.body;
-        // Sanitize input
-        if (!title || typeof title !== 'string' || !description || typeof description !== 'string') {
-          return res.status(400).json({ message: 'Invalid input' });
-        }
-        const newTask: Task = {
-          id: generateUniqueId(),
-          title,
-          completed: false,
-        };
-        await firestore.collection('tasks').add({ ...newTask, userId });
-        return res.status(201).json(newTask);
-      } catch (err) {
-        return res.status(500).json({ message: err instanceof Error ? err.message : String(err) });
+      } catch (error) {
+        return res.status(500).json({ message: 'Error retrieving tasks', error: error instanceof Error ? error.message : String(error) });
       }
     }
     default:
-      res.setHeader('Allow', ['GET', 'POST']);
+      res.setHeader('Allow', ['GET']);
       return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
