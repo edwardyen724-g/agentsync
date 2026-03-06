@@ -3,8 +3,12 @@ import { getAuth } from 'firebase-admin/auth';
 import admin from 'firebase-admin/app';
 
 if (!admin.apps.length) {
+  const firebaseAdminSdkJson = process.env.FIREBASE_ADMIN_SDK_JSON;
+  if (!firebaseAdminSdkJson) {
+    throw new Error('Missing Firebase Admin SDK JSON credentials in environment variables.');
+  }
   admin.initializeApp({
-    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_ADMIN_SDK_JSON as string)),
+    credential: admin.credential.cert(JSON.parse(firebaseAdminSdkJson)),
   });
 }
 
