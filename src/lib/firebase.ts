@@ -20,4 +20,4 @@ try {
 const firestore = getFirestore(app);
 const auth = getAuth(app);
 
-export { firestore, collection, getDocs, auth, signInWithEmailAndPassword, admin };
+export { firestore, collection, getDocs, auth, signInWithEmailAndPassword };
