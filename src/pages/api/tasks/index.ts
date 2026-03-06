@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import admin from 'firebase-admin';
-import { db } from '../../../lib/firebase'; // Adjust this import based on your project structure
-import { Task } from '../../../models/Task'; // Adjust this import based on your project structure
+import { firestore } from '../../../lib/firebase';
+import { Task } from '../../../models/Task';
 
 interface AuthedRequest extends NextApiRequest {
   user?: { uid: string }; // Extend request to include user info
@@ -47,7 +47,7 @@ export default async function handler(req: AuthedRequest, res: NextApiResponse) 
       }
 
       try {
-        const tasksSnapshot = await db.collection('tasks').where('userId', '==', userId).get();
+        const tasksSnapshot = await firestore.collection('tasks').where('userId', '==', userId).get();
         const tasksData = tasksSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -69,14 +69,8 @@ export default async function handler(req: AuthedRequest, res: NextApiResponse) 
           return res.status(400).json({ message: 'Title and description are required' });
         }
 
-        const newTask = new Task({
-          title,
-          description,
-          userId,
-          createdAt: new Date(),
-        });
-
-        await newTask.save();
+        const newTask = { title, description, userId, createdAt: new Date() };
+        await firestore.collection('tasks').add(newTask);
         return res.status(201).json(newTask);
       } catch (err) {
         return res.status(500).json({ message: err instanceof Error ? err.message : String(err) });
