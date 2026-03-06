@@ -48,14 +48,13 @@ export default async function handler(req: AuthedRequest, res: NextApiResponse) 
 
       try {
         const tasksSnapshot = await firestore.collection('tasks').where('userId', '==', userId).get();
-        const tasksData = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as Task) }));
-        return res.status(200).json(tasksData);
+        const tasksData = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return res.status(200).json({ tasks: tasksData });
       } catch (error) {
-        return res.status(500).json({ message: 'Failed to fetch tasks', error: error instanceof Error ? error.message : String(error) });
+        return res.status(500).json({ message: 'Error fetching tasks', error: error instanceof Error ? error.message : String(error) });
       }
     }
-    // Additional cases for POST, PUT, DELETE can be handled here
-
+    // Other methods (POST, DELETE, etc.) can also be handled here
     default:
       res.setHeader('Allow', ['GET']);
       return res.status(405).end(`Method ${req.method} Not Allowed`);
