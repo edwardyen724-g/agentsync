@@ -45,7 +45,7 @@ export default async function register(req: AuthedRequest, res: NextApiResponse)
   if (usersMap.has(email)) {
     const attemptCount = usersMap.get(email)!;
     if (attemptCount >= 5) {
-      return res.status(429).json({ message: 'Too many attempts, please try again later.' });
+      return res.status(429).json({ message: 'Too many attempts. Please try again later.' });
     }
     usersMap.set(email, attemptCount + 1);
   } else {
@@ -53,9 +53,12 @@ export default async function register(req: AuthedRequest, res: NextApiResponse)
   }
 
   try {
-    const userRecord = await getAuth().createUser({ email, password });
-    return res.status(201).json({ message: 'User created successfully.', uid: userRecord.uid });
-  } catch (err) {
-    return res.status(500).json({ message: err instanceof Error ? err.message : String(err) });
+    const userRecord = await getAuth().createUser({
+      email,
+      password,
+    });
+    return res.status(201).json({ message: 'User created successfully', uid: userRecord.uid });
+  } catch (error) {
+    return res.status(500).json({ message: 'User creation failed', error: error instanceof Error ? error.message : String(error) });
   }
-}
+};
