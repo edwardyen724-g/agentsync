@@ -39,7 +39,7 @@ const SettingsPage: React.FC = () => {
         <h2 className="text-xl font-semibold mb-4">Manage Your Settings</h2>
         <ul>
           {settings.map(setting => (
-            <li key={setting.id}>{setting.title}</li>
+            <li key={setting.id} className="mb-2">{setting.someProperty}</li>
           ))}
         </ul>
       </div>
