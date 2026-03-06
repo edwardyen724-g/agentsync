@@ -13,7 +13,7 @@ export const isValidObjectId = (id: string): boolean => {
 
 // Helper function to create a response
 export const createResponse = (
-  res: any,
+  res: NextApiResponse,
   status: number,
   data: any,
   message: string = ''
