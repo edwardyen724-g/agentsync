@@ -7,7 +7,7 @@ interface AuthedRequest extends NextApiRequest {
   user?: { uid: string }; // Extend request to include user info
 }
 
-const tasks: Map<string, number[]> = new Map();
+const tasks: Map<string, number> = new Map();
 
 const rateLimit = (key: string) => {
   const currentTime = Date.now();
@@ -50,10 +50,13 @@ export default async function handler(req: AuthedRequest, res: NextApiResponse) 
         const tasksSnapshot = await firestore.collection('tasks').where('userId', '==', userId).get();
         const tasksData = tasksSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         return res.status(200).json(tasksData);
-      } catch (err) {
-        return res.status(500).json({ message: 'Error fetching tasks', error: err instanceof Error ? err.message : String(err) });
+      } catch (error) {
+        return res.status(500).json({ message: 'Failed to retrieve tasks', error: error instanceof Error ? error.message : String(error) });
       }
     }
+
+    // Handle other HTTP methods as needed
+
     default:
       res.setHeader('Allow', ['GET']);
       return res.status(405).end(`Method ${req.method} Not Allowed`);
