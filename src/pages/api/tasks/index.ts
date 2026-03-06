@@ -7,7 +7,7 @@ interface AuthedRequest extends NextApiRequest {
   user?: { uid: string }; // Extend request to include user info
 }
 
-const tasks: Map<string, number> = new Map();
+const tasks: Map<string, number[]> = new Map();
 
 const rateLimit = (key: string) => {
   const currentTime = Date.now();
@@ -48,14 +48,13 @@ export default async function handler(req: AuthedRequest, res: NextApiResponse) 
 
       try {
         const tasksSnapshot = await firestore.collection('tasks').where('userId', '==', userId).get();
-        const tasksData = tasksSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const tasksData = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as Task) }));
         return res.status(200).json(tasksData);
       } catch (error) {
-        return res.status(500).json({ message: 'Failed to retrieve tasks', error: error instanceof Error ? error.message : String(error) });
+        return res.status(500).json({ message: 'Failed to fetch tasks', error: error instanceof Error ? error.message : String(error) });
       }
     }
-
-    // Handle other HTTP methods as needed
+    // Additional cases for POST, PUT, DELETE can be handled here
 
     default:
       res.setHeader('Allow', ['GET']);
