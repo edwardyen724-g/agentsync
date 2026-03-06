@@ -12,7 +12,10 @@ const firebaseAuth = getAuth(initializeApp({
 }));
 
 interface AuthedRequest extends NextApiRequest {
-  // Add any custom properties here
+  body: {
+    email: string;
+    password: string;
+  };
 }
 
 const rateLimit = new Map<string, number>();
@@ -23,6 +26,10 @@ const loginHandler = async (req: AuthedRequest, res: NextApiResponse) => {
   }
 
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required.' });
+  }
 
   const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
@@ -38,10 +45,9 @@ const loginHandler = async (req: AuthedRequest, res: NextApiResponse) => {
       rateLimit.set(ip, (rateLimit.get(ip) || 0) + 1);
       setTimeout(() => rateLimit.delete(ip), 60000); // Reset rate limit after 1 minute
     }
-    
     return res.status(200).json({ uid: user.uid, email: user.email });
   } catch (err) {
-    return res.status(400).json({ message: err instanceof Error ? err.message : String(err) });
+    return res.status(500).json({ message: err instanceof Error ? err.message : String(err) });
   }
 };
 
