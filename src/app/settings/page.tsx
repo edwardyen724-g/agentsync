@@ -1,9 +1,9 @@
 import React from 'react';
 import { useSession } from 'next-auth/react';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { firestore } from '../../lib/firebase';
+import { app } from '../../lib/firebase';
 
-const db = firestore;
+const db = getFirestore(app);
 
 const SettingsPage: React.FC = () => {
   const { data: session } = useSession();
