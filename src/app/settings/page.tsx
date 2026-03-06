@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSession } from 'next-auth/react';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { app } from '../../lib/firebase'; // Assuming you have initialized your Firebase app in this file
+import { app } from '../../lib/firebase';
 
 const db = getFirestore(app);
 
@@ -39,7 +39,7 @@ const SettingsPage: React.FC = () => {
         <h2 className="text-xl font-semibold mb-4">Manage Your Settings</h2>
         <ul>
           {settings.map(setting => (
-            <li key={setting.id} className="mb-2">{setting.someProperty}</li>
+            <li key={setting.id}>{setting.name}</li>
           ))}
         </ul>
       </div>
