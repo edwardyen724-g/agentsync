@@ -65,18 +65,23 @@ export default async function handler(req: AuthedRequest, res: NextApiResponse) 
 
       try {
         const { title, description } = req.body;
-        if (!title || !description) {
-          return res.status(400).json({ message: 'Title and description are required' });
+        // Sanitize input
+        if (!title || typeof title !== 'string' || !description || typeof description !== 'string') {
+          return res.status(400).json({ message: 'Invalid input' });
         }
-
-        const newTask = { title, description, userId, createdAt: new Date() };
-        await firestore.collection('tasks').add(newTask);
+        const newTask: Task = {
+          id: generateUniqueId(),
+          title,
+          completed: false,
+        };
+        await firestore.collection('tasks').add({ ...newTask, userId });
         return res.status(201).json(newTask);
       } catch (err) {
         return res.status(500).json({ message: err instanceof Error ? err.message : String(err) });
       }
     }
     default:
-      return res.setHeader('Allow', ['GET', 'POST']).status(405).end(`Method ${req.method} Not Allowed`);
+      res.setHeader('Allow', ['GET', 'POST']);
+      return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
