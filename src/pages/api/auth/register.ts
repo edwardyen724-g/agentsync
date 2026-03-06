@@ -28,6 +28,20 @@ export default async function register(req: AuthedRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required.' });
+  }
+
+  // Check if user already exists
+  try {
+    const userRecord = await getAuth().getUserByEmail(email);
+    return res.status(409).json({ message: 'User already exists.' });
+  } catch (err) {
+    if (err.code !== 'auth/user-not-found') {
+      return res.status(500).json({ message: err instanceof Error ? err.message : String(err) });
+    }
+  }
+
   if (usersMap.has(email)) {
     const attemptCount = usersMap.get(email)!;
     if (attemptCount >= 5) {
