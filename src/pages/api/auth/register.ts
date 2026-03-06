@@ -47,6 +47,6 @@ export default async function register(req: AuthedRequest, res: NextApiResponse)
     const newUser = await getAuth().createUser({ email, password });
     return res.status(201).json({ message: 'User registered successfully', uid: newUser.uid });
   } catch (error) {
-    return res.status(500).json({ message: 'Error creating user', error: error instanceof Error ? error.message : String(error) });
+    return res.status(500).json({ message: 'User creation failed', error: error instanceof Error ? error.message : String(error) });
   }
 };
