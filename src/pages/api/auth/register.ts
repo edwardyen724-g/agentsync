@@ -42,23 +42,11 @@ export default async function register(req: AuthedRequest, res: NextApiResponse)
     }
   }
 
-  if (usersMap.has(email)) {
-    const attemptCount = usersMap.get(email)!;
-    if (attemptCount >= 5) {
-      return res.status(429).json({ message: 'Too many attempts. Please try again later.' });
-    }
-    usersMap.set(email, attemptCount + 1);
-  } else {
-    usersMap.set(email, 1);
-  }
-
+  // Create user
   try {
-    const userRecord = await getAuth().createUser({
-      email,
-      password,
-    });
-    return res.status(201).json({ message: 'User created successfully', uid: userRecord.uid });
+    const newUser = await getAuth().createUser({ email, password });
+    return res.status(201).json({ message: 'User registered successfully', uid: newUser.uid });
   } catch (error) {
-    return res.status(500).json({ message: 'User creation failed', error: error instanceof Error ? error.message : String(error) });
+    return res.status(500).json({ message: 'Error creating user', error: error instanceof Error ? error.message : String(error) });
   }
 };
