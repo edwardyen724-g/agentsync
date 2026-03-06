@@ -1,4 +1,5 @@
-import { NextApiRequest } from 'next';
+// Importing necessary types
+import { NextApiRequest, NextApiResponse } from 'next';
 import { ObjectId } from 'mongoose';
 
 // Define the custom request with additional properties if needed
@@ -13,7 +14,7 @@ export const isValidObjectId = (id: string): boolean => {
 
 // Helper function to create a response
 export const createResponse = (
-  res: any,
+  res: NextApiResponse,
   status: number,
   data: any,
   message: string = ''
